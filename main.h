@@ -1,3 +1,5 @@
+#define CM_FILE_DELETE_ALL    9084
+#define CM_FILE_SELECTALL     9083
 #define CM_FILE_TEST          9082
 #define CM_FILE_UPDATE        9081
 #define CM_FILE_SELECTFONT    9080

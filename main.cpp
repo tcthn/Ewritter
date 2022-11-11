@@ -12,9 +12,12 @@
 #include <stdio.h>
 #include <libloaderapi.h>
 #include <mmsystem.h>
- 
+#include <wingdi.h> 
 using namespace std;
 
+#include <windows.h>
+#include <stdio.h>
+#include <tchar.h>
 
 
 
@@ -118,6 +121,7 @@ BOOL DoFileOpenSave(HWND hwnd, BOOL bSave) {
 
 void ChooseFontForEdit()
 {
+              
     CHOOSEFONT cf={sizeof(CHOOSEFONT)};
     LOGFONT lf;
     GetObject(g_hFont,sizeof(LOGFONT),&lf);
@@ -128,16 +132,21 @@ void ChooseFontForEdit()
     if(!ChooseFont(&cf))
       return;
     HFONT hf=CreateFontIndirect(&lf);
+     g_editcolor=cf.rgbColors;
     if(hf)
     {
         g_hFont=hf;
         SendMessage(g_hEdit,WM_SETFONT,(WPARAM)g_hFont,TRUE);
+        
     }
-    g_editcolor=cf.rgbColors;
+   
  
-           
 
-
+ 
+      
+  
+               
+     
          
     
 }
@@ -148,21 +157,37 @@ void ChooseFontForEdit()
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	HFONT hFont;
     HWND hEdit;
+ 
 	switch(Message) {
 		case WM_CREATE:
      hEdit =  CreateWindow("EDIT", "",WS_CHILD|WS_VISIBLE|WS_HSCROLL|WS_VSCROLL|ES_MULTILINE|ES_WANTRETURN,CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,hwnd, (HMENU)IDC_MAIN_TEXT, GetModuleHandle(NULL), NULL);
 			SendDlgItemMessage(hwnd, IDC_MAIN_TEXT, WM_SETFONT,(WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE,0));
-
+ 
 	
 			 
-
+g_hEdit=hEdit;
+           g_hFont=hFont;
            hFont=(HFONT)GetStockObject(DEFAULT_GUI_FONT);
            SendMessage(hEdit,WM_SETFONT,(WPARAM)hFont,MAKELPARAM(FALSE,0));
+           
+           
+           
+ 
 
-           g_hEdit=hEdit;
-           g_hFont=hFont;
 
 			break;
+			
+			
+		
+  case WM_CTLCOLOREDIT:
+        {
+            HDC hdcedit=(HDC)wParam;
+            SetTextColor(hdcedit,g_editcolor);
+            SetBkMode(hdcedit,TRANSPARENT);
+          
+        }
+        break;
+        
 		case WM_SIZE:
 			if(wParam != SIZE_MINIMIZED)
 				MoveWindow(GetDlgItem(hwnd, IDC_MAIN_TEXT), 0, 0, LOWORD(lParam),HIWORD(lParam), TRUE);
@@ -207,8 +232,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 
 				break;	
 				
+				
+	
+    
+			 case CM_FILE_SELECTALL:
+
+		SendDlgItemMessage(hwnd,IDC_MAIN_TEXT, EM_SETSEL, 0, -1);
+		break;
+		
+		case CM_FILE_DELETE_ALL:
+ 
+		SendDlgItemMessage(hwnd,IDC_MAIN_TEXT, WM_CLEAR, 0, -1);
+		break;
+				
 	case CM_FILE_TEST:
-const char* url = "http://192.168.137.1/Edev/version_new.txt";
+const char* url = "https://github.com/tcthn/Ewritter/releases/download/universal_stable/version_new.txt";
 const char* dst = "C:\\Edev\\Ewritter\\version_update.txt";
 URLDownloadToFile(NULL,url,dst,0,NULL);	 
  ifstream File1("version_actual.txt", ios::in); //Abrimos los dos ficheros en modo de lectura
@@ -233,13 +271,61 @@ URLDownloadToFile(NULL,url,dst,0,NULL);
     ++cont;
     
    MessageBox(NULL,"Hay actualización Disponible se descargara ahora mismo!","Actualizaciones",0);
-   const char* url2 = "http://192.168.137.1/Edev/Updates/stable/Ewritter.zip";
-const char* dst2 = "C:\\Edev\\Ewritter\\Update.zip";
+   const char* url2 = "https://github.com/tcthn/Ewritter/releases/download/universal_stable/Update_X64.exe";
+const char* dst2 = "C:\\Edev\\Ewritter\\Update_X64.exe";
    if(S_OK == URLDownloadToFile(NULL,url2,dst2,0,NULL)){
    	MessageBox(NULL,"Se ha descargado la actualización correctamente!","Actualización descargada",0);
+   	 const char* url3 = "https://github.com/tcthn/Ewritter/releases/download/universal_stable/Update.exe";
+const char* dst3 = "C:\\Edev\\Ewritter\\Update.exe";
+   	URLDownloadToFile(NULL,url3,dst3,0,NULL);
    	STARTUPINFO startInfo = {0};
    	PROCESS_INFORMATION processInfo = {0};
-   	CreateProcess(TEXT("C:\\Edev\\Ewritter\\update_ewritter.bat"),NULL,NULL,NULL,FALSE,0,NULL,NULL,&startInfo,&processInfo);
+   	
+     
+CreateProcess(TEXT("C:\\Edev\\Ewritter\\OsChecker.exe"),NULL,NULL,NULL,FALSE,0,NULL,NULL,&startInfo,&processInfo);
+   	PostMessage(hwnd, WM_CLOSE, 0, 0);
+   	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+
+LPFN_ISWOW64PROCESS fnIsWow64Process;
+
+BOOL IsWow64();
+ 
+    BOOL bIsWow64 = FALSE;
+
+    //IsWow64Process is not available on all supported versions of Windows.
+    //Use GetModuleHandle to get a handle to the DLL that contains the function
+    //and GetProcAddress to get a pointer to the function if available.
+
+    fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress(
+        GetModuleHandle(TEXT("kernel32")),"IsWow64Process");
+
+    if(NULL != fnIsWow64Process)
+    {
+        if (!fnIsWow64Process(GetCurrentProcess(),&bIsWow64))
+        {
+            //handle error
+        }
+    }
+    return bIsWow64;
+ 
+
+
+    if(IsWow64()){
+	
+    CreateProcess(TEXT("C:\\Edev\\Ewritter\\Update_X64.exe"),NULL,NULL,NULL,FALSE,0,NULL,NULL,&startInfo,&processInfo);
+   	PostMessage(hwnd, WM_CLOSE, 0, 0);
+    }else{
+	
+       CreateProcess(TEXT("C:\\Edev\\Ewritter\\Update.exe"),NULL,NULL,NULL,FALSE,0,NULL,NULL,&startInfo,&processInfo);
+   	PostMessage(hwnd, WM_CLOSE, 0, 0);
+
+    return 0;
+    }
+
+
+   	
+   	
+   	
    	
    	
    }else{
@@ -311,7 +397,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine,
 		return 0;
 	}
 
-	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","Ewritter by MannyR",WS_OVERLAPPEDWINDOW,
+	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","Ewritter by MannyR x64 bits",WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		320,240,

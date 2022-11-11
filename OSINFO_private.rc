@@ -3,17 +3,13 @@
 
 #include <windows.h> // include for version info constants
 
-#include "resource.rc"
-#include "icon.rc"
-
-A ICON "Ewriter.ico"
 
 //
 // TO CHANGE VERSION INFORMATION, EDIT PROJECT OPTIONS...
 //
 1 VERSIONINFO
-FILEVERSION 2,1,9,0
-PRODUCTVERSION 2,1,9,0
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
 FILETYPE VFT_APP
 {
   BLOCK "StringFileInfo"
@@ -21,14 +17,14 @@ FILETYPE VFT_APP
     BLOCK "480A04E4"
     {
       VALUE "CompanyName", "Edev"
-      VALUE "FileVersion", "2.1.9.0"
-      VALUE "FileDescription", "Potente editor de texto"
-      VALUE "InternalName", "Ewritter"
+      VALUE "FileVersion", "1.0.0.0"
+      VALUE "FileDescription", "Os Checker by MannyR"
+      VALUE "InternalName", "Oschecker.exe"
       VALUE "LegalCopyright", "Edev ©2022"
       VALUE "LegalTrademarks", "Edev"
-      VALUE "OriginalFilename", "Ewritter"
-      VALUE "ProductName", "Ewritter"
-      VALUE "ProductVersion", "2.1.9.0"
+      VALUE "OriginalFilename", "OsChecker.exe"
+      VALUE "ProductName", "Oschecker For Ewritter"
+      VALUE "ProductVersion", "1.0.0.0"
     }
   }
   BLOCK "VarFileInfo"
