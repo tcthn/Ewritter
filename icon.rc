@@ -1,0 +1,5 @@
+#ifndef _resource_rc
+#define _resource_rc
+MAIN ICON "Ewritter.ico"
+
+#endif
